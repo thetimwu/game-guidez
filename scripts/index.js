@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //display data
 const guideList = document.querySelector(".guides");
-let html = "";
 const displayData = (docs) => {
+  let html = "";
   if (docs.length) {
     docs.forEach((doc) => {
       const guide = doc.data();
@@ -30,12 +30,15 @@ const displayData = (docs) => {
 //display UI
 const loginUIs = document.querySelectorAll(".logged-in");
 const logoutUIs = document.querySelectorAll(".logged-out");
+const accountDetail = document.querySelector(".account-details");
 
 const displayUI = (user) => {
   if (user) {
+    accountDetail.innerHTML = `<div>Logged in as ${user.email} </div>`;
     loginUIs.forEach((item) => (item.style.display = "block"));
     logoutUIs.forEach((item) => (item.style.display = "none"));
   } else {
+    accountDetail.innerHTML = "";
     loginUIs.forEach((item) => (item.style.display = "none"));
     logoutUIs.forEach((item) => (item.style.display = "block"));
   }

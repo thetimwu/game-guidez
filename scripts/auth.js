@@ -2,12 +2,10 @@
 auth.onAuthStateChanged((user) => {
   if (user) {
     //get data from firestore
-    db.collection("guides")
-      .get()
-      .then((res) => {
-        displayData(res.docs);
-        displayUI(user);
-      });
+    db.collection("guides").onSnapshot((res) => {
+      displayData(res.docs);
+      displayUI(user);
+    });
   } else {
     displayData([]);
     displayUI();
