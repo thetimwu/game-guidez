@@ -1,7 +1,16 @@
 //listen for auth status changes
 auth.onAuthStateChanged((user) => {
   if (user) {
+    //get data from firestore
+    db.collection("guides")
+      .get()
+      .then((res) => {
+        displayData(res.docs);
+        displayUI(user);
+      });
   } else {
+    displayData([]);
+    displayUI();
   }
 });
 
@@ -42,4 +51,21 @@ loginForm.addEventListener("submit", async (e) => {
   const modal = document.querySelector("#modal-login");
   M.Modal.getInstance(modal).close();
   loginForm.reset();
+});
+
+//create new guide
+const createForm = document.querySelector("#create-form");
+createForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    const res = await db.collection("guides").add({
+      title: createForm["title"].value,
+      content: createForm["content"].value,
+    });
+    const modal = document.querySelector("#modal-create");
+    M.Modal.getInstance(modal).close();
+    createForm.reset();
+  } catch (err) {
+    console.log(err.message);
+  }
 });
