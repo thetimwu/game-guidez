@@ -1,11 +1,23 @@
+// call cloud functions
+const adminForm = document.querySelector(".admin-actions");
+adminForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.querySelector("#admin-email").value;
+  const addAdminRole = functions.httpsCallable("addAdminRole");
+  const res = await addAdminRole({ email: email });
+  console.log(res);
+});
+
 //listen for auth status changes
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
   if (user) {
+    const res = await user.getIdTokenResult();
+    user.admin = res.claims.admin;
+    displayUI(user);
     //get data from firestore
     db.collection("guides").onSnapshot(
       (res) => {
         displayData(res.docs);
-        displayUI(user);
       },
       (err) => {
         console.log(err.message);
@@ -26,13 +38,18 @@ signupForm.addEventListener("submit", async (e) => {
   const password = signupForm["signup-password"].value;
   const bio = signupForm["signup-bio"].value;
 
-  const res = await auth.createUserWithEmailAndPassword(email, password);
-  await db.collection("users").doc(res.user.uid).set({
-    bio: bio,
-  });
-  const modal = document.querySelector("#modal-signup");
-  M.Modal.getInstance(modal).close();
-  signupForm.reset();
+  try {
+    const res = await auth.createUserWithEmailAndPassword(email, password);
+    await db.collection("users").doc(res.user.uid).set({
+      bio: bio,
+    });
+    const modal = document.querySelector("#modal-signup");
+    M.Modal.getInstance(modal).close();
+    signupForm.reset();
+    signupForm.querySelector(".error").innerHTML = "";
+  } catch (err) {
+    signupForm.querySelector(".error").innerHTML = err.message;
+  }
 });
 
 //logout
@@ -52,11 +69,16 @@ loginForm.addEventListener("submit", async (e) => {
   const email = loginForm["login-email"].value;
   const password = loginForm["login-password"].value;
 
-  const res = await auth.signInWithEmailAndPassword(email, password);
-  console.log(res.user);
-  const modal = document.querySelector("#modal-login");
-  M.Modal.getInstance(modal).close();
-  loginForm.reset();
+  try {
+    const res = await auth.signInWithEmailAndPassword(email, password);
+    console.log(res.user);
+    const modal = document.querySelector("#modal-login");
+    M.Modal.getInstance(modal).close();
+    loginForm.reset();
+    loginForm.querySelector(".error").innerHTML = "";
+  } catch (err) {
+    loginForm.querySelector(".error").innerHTML = err.message;
+  }
 });
 
 //create new guide

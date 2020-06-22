@@ -31,15 +31,21 @@ const displayData = (docs) => {
 const loginUIs = document.querySelectorAll(".logged-in");
 const logoutUIs = document.querySelectorAll(".logged-out");
 const accountDetail = document.querySelector(".account-details");
+const adminUIs = document.querySelectorAll(".admin");
 
 const displayUI = async (user) => {
   if (user) {
+    if (user.admin) {
+      adminUIs.forEach((item) => (item.style.display = "block"));
+    }
     const doc = await db.collection("users").doc(user.uid).get();
     accountDetail.innerHTML = `<div>Logged in as ${user.email} </div>
-    <div>${doc.data().bio}</div>`;
+    <div>${doc.data().bio}</div>
+    <div>${user.admin ? "Admin" : ""}`;
     loginUIs.forEach((item) => (item.style.display = "block"));
     logoutUIs.forEach((item) => (item.style.display = "none"));
   } else {
+    adminUIs.forEach((item) => (item.style.display = "none"));
     accountDetail.innerHTML = "";
     loginUIs.forEach((item) => (item.style.display = "none"));
     logoutUIs.forEach((item) => (item.style.display = "block"));

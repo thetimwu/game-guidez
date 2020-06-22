@@ -12,6 +12,9 @@ admin.initializeApp();
 exports.addAdminRole = functions.https.onCall(async (data, context) => {
   try {
     const user = await admin.auth().getUserByEmail(data.email);
+    if (context.auth.token.admin !== true) {
+      return { error: "only admins can add other admins!" };
+    }
     await admin.auth().setCustomUserClaims(user.uid, {
       admin: true,
     });
