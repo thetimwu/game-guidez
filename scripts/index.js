@@ -32,9 +32,11 @@ const loginUIs = document.querySelectorAll(".logged-in");
 const logoutUIs = document.querySelectorAll(".logged-out");
 const accountDetail = document.querySelector(".account-details");
 
-const displayUI = (user) => {
+const displayUI = async (user) => {
   if (user) {
-    accountDetail.innerHTML = `<div>Logged in as ${user.email} </div>`;
+    const doc = await db.collection("users").doc(user.uid).get();
+    accountDetail.innerHTML = `<div>Logged in as ${user.email} </div>
+    <div>${doc.data().bio}</div>`;
     loginUIs.forEach((item) => (item.style.display = "block"));
     logoutUIs.forEach((item) => (item.style.display = "none"));
   } else {

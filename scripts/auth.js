@@ -2,10 +2,15 @@
 auth.onAuthStateChanged((user) => {
   if (user) {
     //get data from firestore
-    db.collection("guides").onSnapshot((res) => {
-      displayData(res.docs);
-      displayUI(user);
-    });
+    db.collection("guides").onSnapshot(
+      (res) => {
+        displayData(res.docs);
+        displayUI(user);
+      },
+      (err) => {
+        console.log(err.message);
+      }
+    );
   } else {
     displayData([]);
     displayUI();
@@ -19,9 +24,12 @@ signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = signupForm["signup-email"].value;
   const password = signupForm["signup-password"].value;
+  const bio = signupForm["signup-bio"].value;
 
   const res = await auth.createUserWithEmailAndPassword(email, password);
-  console.log(res.user);
+  await db.collection("users").doc(res.user.uid).set({
+    bio: bio,
+  });
   const modal = document.querySelector("#modal-signup");
   M.Modal.getInstance(modal).close();
   signupForm.reset();
